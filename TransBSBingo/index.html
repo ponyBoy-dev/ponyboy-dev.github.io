@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>transBS_Bingo!</title>
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet"> 
+
+    <style>
+        body{
+            font-family: 'Oswald', sans-serif;
+
+        }
+        table{
+            border-left:1px solid black;
+            border-top:1px solid black;
+        }
+        td{
+            width: 6em;
+            height: 6em;
+            text-align: center;
+            opacity : 0.6;
+        
+            border-right:1px solid black;
+            border-bottom:1px solid black;
+            background-color: #F27915;
+            color: #C3FFFC;
+
+            cursor:url(viseur.png) 25 25, crosshair;
+        }
+        tr:nth-child(odd) td:nth-child(even),
+        tr:nth-child(even) td:nth-child(odd){
+            background-color: #238A8F;
+            color: #C3FFFC;
+        }
+
+        td:hover{
+            opacity: 0.7;
+        }
+        td.active{
+            opacity:1;
+        }
+        img.imgwin{
+            position: absolute;
+            width: 310px;
+            top: 28px;
+            left: 3px;
+            opacity: 0;
+            transition: all 0.25s ease;
+            transform: scale(0.5);
+            pointer-events: none;
+        }
+        body.won img.imgwin{
+            
+            transform: scale(1);
+            opacity: 0.87;
+        }
+    </style>
+
+</head>
+<body>
+
+    <table cellspacing="0">
+        <tr>
+            <td>une vraie femme/un vrai homme</td>
+            <td>transsexuel·le</td>
+            <td>changer de sexe</td>
+        </tr>
+        <tr>
+            <td>attestation de psychiatre</td>
+            <td>piégé·e dans un corps de garçon/fille</td>
+            <td>dysphorie de genre</td>
+        </tr>
+        <tr>
+            <td>Sexe opposé</td>
+            <td>identité sexuelle</td>
+            <td>devenir homme/femme</td>
+        </tr>
+    </table>
+
+    <img src="bingo.png" class="imgwin" alt="">
+
+    <script>
+
+
+        var soundEls = [];//load 10 audios instead of 1
+        for(var i=0;i<10;i++){
+            var soundEl = document.createElement('audio');
+            soundEl.src = 'gun.mp3';
+            soundEl.preload = 'auto';
+            document.body.appendChild(soundEl);
+            soundEls.push(soundEl);
+        }
+        
+        
+        var soundElIndex = 0;
+        function playbang(){
+            var soundEl = soundEls[soundElIndex];
+
+            if(soundEl.duration > 0 && !soundEl.paused){
+
+                //already playing, switch to next soundEl
+                soundElIndex++;
+                if(!soundEls[soundElIndex]) soundElIndex=0;
+                soundEls[soundElIndex].play();
+
+            }else{
+
+                //not playing
+                soundEl.play();    
+
+            }
+
+
+        }
+
+        var gameIsWon = false;
+
+        var haswinner = new Audio ('tadaa.mp3')
+        function clickHandler(e){
+            var td = e.currentTarget;
+            td.classList.add('active');
+            playbang();
+            var numero = td.getAttribute('data-index');
+            states[numero] = true;
+            var pos = {
+                x: e.pageX, 
+                y: e.pageY
+            }
+            addBulletImpact(pos);
+            if(hasWon() === true){
+                if(gameIsWon === false){
+                    console.log('wiiiiiii');
+                    setTimeout(winshow, 500);
+                    gameIsWon = true;
+                }
+            }
+
+        }
+
+        function winshow(){
+            haswinner.play()
+            document.body.classList.add('won')
+        }
+
+
+
+        var tds = document.querySelectorAll('td');
+        
+        var states = [];
+
+
+        for(var i=0; i<tds.length; i++){
+            var td = tds[i];
+            td.addEventListener('click', clickHandler);
+            states.push(false); 
+            td.setAttribute('data-index',i);
+        }
+
+        //
+
+
+
+        function addBulletImpact(pos){
+            var BulletImpact = document.createElement('img');
+            BulletImpact.src = 'impact.png';
+            BulletImpact.style.pointerEvents = 'none';
+            BulletImpact.style.position = 'absolute';
+            BulletImpact.style.left = (pos.x-7.5) + 'px';
+            BulletImpact.style.top = (pos.y-7) + 'px';//set position
+            document.body.appendChild(BulletImpact);//add an image
+
+        }
+
+
+        function hasWon(){
+            var foundFalse = false;
+            for(var i=0; i<states.length; i++){
+                if(states[i] === false){
+                    foundFalse = true;
+                    break;
+                }   
+            }
+
+            return !foundFalse;
+
+        }
+
+
+
+        
+
+    </script>
+    
+</body>
+</html>
